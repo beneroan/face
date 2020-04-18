@@ -37,5 +37,4 @@ def identify (file):
    for person in results:
       print(person.candidates[0])
       print('identified ' + os.path.basename(image.name) + '. Confidence: ' + str(person.candidates[0].confidence))
-
-identify(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'test2.jpg'))
+      return person.candidates[0];

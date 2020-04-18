@@ -2,10 +2,19 @@
 
 ## Setup
 
+Configure azure
+
 ```
 pip install --upgrade azure-cognitiveservices-vision-face
 export FACE_ENDPOINT="https://<service_name>.cognitiveservices.azure.com/"
 export FACE_SUBSCRIPTION_KEY="<key>"
+```
+
+Make sure flask is installed, then start the api.
+
+```
+export FLASK_APP=main.py
+python -m flask run --port 5001
 ```
 
 ## For the service trained on my account, the face IDs are:
