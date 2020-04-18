@@ -26,7 +26,10 @@ def identify (file):
    faces = face_client.face.detect_with_stream(image)
    for face in faces:
       face_ids.append(face.face_id)
-   
+
+   if (len(face_ids) == 0):
+      return
+
    results = face_client.face.identify(face_ids, PERSON_GROUP_ID);
    print('Identifying faces')
    if not results:
@@ -35,4 +38,4 @@ def identify (file):
       print(person.candidates[0])
       print('identified ' + os.path.basename(image.name) + '. Confidence: ' + str(person.candidates[0].confidence))
 
-identify(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'test.jpg'))
+identify(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'test2.jpg'))
