@@ -3,7 +3,7 @@ from flask import jsonify
 from flask import Flask, flash, request, redirect, url_for
 from werkzeug.utils import secure_filename
 import uuid
-from identify_face import identify
+from identify_face import identify, getLastSeen
 
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__)) + '/uploads'
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
@@ -27,23 +27,25 @@ def upload_file():
             <input type=submit value=Upload>
          </form>
          '''
-
-   if 'file' not in request.files:
-      return 'err 1'
    
-   file = request.files['file']
+   identity = getLastSeen()
 
-   if file and file.filename != '' and allowed_file(file.filename):
-      filename = str(uuid.uuid1()) + secure_filename(file.filename)
-      print((os.path.join(app.config['UPLOAD_FOLDER'], filename)))
-      file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+   if 'file' in request.files:
+      file = request.files['file']
 
-      identity = identify(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-      print(identity)
-      
+      if file and file.filename != '' and allowed_file(file.filename):
+         filename = str(uuid.uuid1()) + secure_filename(file.filename)
+         print((os.path.join(app.config['UPLOAD_FOLDER'], filename)))
+         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+         identity = identify(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+   
+   print(identity)
+   
+   if (identity):
       return jsonify({ 'id': identity.person_id, 'confidence': identity.confidence })
-      
-   return 'err 2'
+   else:
+      return jsonify({ 'id': '', 'confidence': 0 })
 
 # if __name__ == '__main__':
 #    app.run(port=6000)

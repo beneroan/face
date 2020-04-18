@@ -12,6 +12,12 @@ from PIL import Image, ImageDraw
 from azure.cognitiveservices.vision.face import FaceClient
 from msrest.authentication import CognitiveServicesCredentials
 from azure.cognitiveservices.vision.face.models import TrainingStatusType, Person, SnapshotObjectType, OperationStatusType
+import sched, time
+import threading
+import random
+from cv2 import VideoCapture, imwrite
+
+cam = VideoCapture(0)
 
 KEY = os.environ['FACE_SUBSCRIPTION_KEY']
 ENDPOINT = os.environ['FACE_ENDPOINT']
@@ -34,7 +40,37 @@ def identify (file):
    print('Identifying faces')
    if not results:
       print('No one identified')
+      return 0
    for person in results:
+      if not person.candidates:
+         return 0;
       print(person.candidates[0])
       print('identified ' + os.path.basename(image.name) + '. Confidence: ' + str(person.candidates[0].confidence))
       return person.candidates[0];
+
+lastSeen = None
+def getFace():
+   while True:
+      global lastSeen
+      print('checking face')
+      success, image = cam.read()
+      if not success:
+         return
+      
+      imwrite("uploads/lastimage.jpg", image)
+
+      res = identify(os.path.dirname(os.path.realpath(__file__)) + '/uploads/lastimage.jpg')
+      if res == 0 or res == None:
+         pass
+      else:
+         lastSeen = res
+
+      print("Last seen: ")
+      print(lastSeen)
+      time.sleep(5)
+
+def getLastSeen ():
+   return lastSeen
+
+thread = threading.Thread(target=getFace, args=())
+thread.start()
